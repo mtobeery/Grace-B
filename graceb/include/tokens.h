@@ -11,6 +11,7 @@ typedef enum {
     TOKEN_PUNCTUATION,
     TOKEN_INT,
     TOKEN_IF,
+    TOKEN_ELSE,
     TOKEN_WHILE
 } TokenType;
 

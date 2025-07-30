@@ -54,6 +54,8 @@ void print_ast(ASTNode* root) {
             printf("IF (%d)\n", cond);
             if (cond) {
                 print_ast(root->right);
+            } else if (root->else_branch) {
+                print_ast(root->else_branch);
             }
             break;
         }
@@ -76,6 +78,7 @@ static void free_node(ASTNode* node) {
     if (!node) return;
     free_node(node->left);
     free_node(node->right);
+    free_node(node->else_branch);
     free(node->name);
     free(node->value);
     free(node);

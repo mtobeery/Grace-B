@@ -18,23 +18,52 @@ static Token* advance() {
     return &tokens[current++];
 }
 
+static ASTNode* parse_expression();
+
 static ASTNode* parse_primary() {
     Token* t = advance();
-    ASTNode* node = malloc(sizeof(ASTNode));
-    memset(node, 0, sizeof(ASTNode));
+    ASTNode* node = calloc(1, sizeof(ASTNode));
 
     if (t->type == TOKEN_NUMBER) {
         node->type = AST_INT_LITERAL;
         node->value = strdup(t->lexeme);
-    } else if (t->type == TOKEN_IDENTIFIER) {
-        node->type = AST_IDENTIFIER;
-        node->name = strdup(t->lexeme);
-    } else {
-        free(node);
-        return NULL;
+        return node;
     }
 
-    return node;
+    if (t->type == TOKEN_IDENTIFIER) {
+        /* function call expression */
+        if (peek()->type == TOKEN_PUNCTUATION && strcmp(peek()->lexeme, "(") == 0) {
+            advance(); /* consume '(' */
+            ASTNode* args_head = NULL;
+            ASTNode* args_tail = NULL;
+            if (!(peek()->type == TOKEN_PUNCTUATION && strcmp(peek()->lexeme, ")") == 0)) {
+                while (1) {
+                    ASTNode* arg = parse_expression();
+                    if (!args_head) args_head = arg; else args_tail->next = arg;
+                    args_tail = arg;
+                    if (peek()->type == TOKEN_PUNCTUATION && strcmp(peek()->lexeme, ",") == 0) {
+                        advance();
+                        continue;
+                    }
+                    break;
+                }
+            }
+            if (peek()->type == TOKEN_PUNCTUATION && strcmp(peek()->lexeme, ")") == 0)
+                advance();
+
+            node->type = AST_FUNCTION_CALL_EXPR;
+            node->name = strdup(t->lexeme);
+            node->args = args_head;
+            return node;
+        }
+
+        node->type = AST_IDENTIFIER;
+        node->name = strdup(t->lexeme);
+        return node;
+    }
+
+    free(node);
+    return NULL;
 }
 
 static ASTNode* parse_expression() {

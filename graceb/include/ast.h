@@ -5,6 +5,7 @@ typedef enum {
     AST_INT_LITERAL,
     AST_IDENTIFIER,
     AST_BINARY_EXPR,
+    AST_FUNCTION_CALL_EXPR,
     AST_PRINT_STATEMENT,
     AST_VAR_DECL,
     AST_IF_STATEMENT,
@@ -19,6 +20,7 @@ typedef struct ASTNode {
     struct ASTNode* left;
     struct ASTNode* right;
     struct ASTNode* else_branch;
+    struct ASTNode* args;
     struct ASTNode* next;
 } ASTNode;
 

@@ -2,6 +2,8 @@
 #include <string.h>
 #include "../include/symbol_table.h"
 
+static Function* f_head = NULL;
+
 static Symbol* head = NULL;
 
 void add_symbol(const char* name, const char* value) {
@@ -24,6 +26,26 @@ const char* lookup_symbol(const char* name) {
     return NULL;
 }
 
+void add_function(const char* name, ASTNode* body) {
+    Function* f = malloc(sizeof(Function));
+    if (!f) return;
+    f->name = strdup(name);
+    f->body = body;
+    f->next = f_head;
+    f_head = f;
+}
+
+ASTNode* lookup_function(const char* name) {
+    Function* cur = f_head;
+    while (cur) {
+        if (strcmp(cur->name, name) == 0) {
+            return cur->body;
+        }
+        cur = cur->next;
+    }
+    return NULL;
+}
+
 void clear_symbols() {
     Symbol* cur = head;
     while (cur) {
@@ -34,4 +56,14 @@ void clear_symbols() {
         free(tmp);
     }
     head = NULL;
+
+    Function* fcur = f_head;
+    while (fcur) {
+        Function* tmp = fcur;
+        fcur = fcur->next;
+        free(tmp->name);
+        /* body not managed for now */
+        free(tmp);
+    }
+    f_head = NULL;
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/ast.h"
 #include "../include/symbol_table.h"
 
@@ -18,6 +19,19 @@ int evaluate(ASTNode* node) {
             if (node->op == '+') return l + r;
             if (node->op == '-') return l - r;
             if (node->op == '=') return l == r;
+            return 0;
+        }
+        case AST_FUNCTION_CALL_EXPR: {
+            /* simple built-in functions */
+            if (!node->name) return 0;
+            int arg1 = 0, arg2 = 0;
+            if (node->args) {
+                arg1 = evaluate(node->args);
+                if (node->args->next)
+                    arg2 = evaluate(node->args->next);
+            }
+            if (strcmp(node->name, "add") == 0) return arg1 + arg2;
+            if (strcmp(node->name, "multiply") == 0) return arg1 * arg2;
             return 0;
         }
         default:
@@ -47,6 +61,11 @@ void print_ast(ASTNode* root) {
         case AST_BINARY_EXPR: {
             int v = evaluate(root);
             printf("BIN_EXPR: %d\n", v);
+            break;
+        }
+        case AST_FUNCTION_CALL_EXPR: {
+            int v = evaluate(root);
+            printf("CALL %s => %d\n", root->name, v);
             break;
         }
         case AST_IF_STATEMENT: {
@@ -79,6 +98,7 @@ static void free_node(ASTNode* node) {
     free_node(node->left);
     free_node(node->right);
     free_node(node->else_branch);
+    free_node(node->args);
     free(node->name);
     free(node->value);
     free(node);

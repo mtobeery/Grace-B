@@ -48,8 +48,8 @@ ASTNode* parse_tokens() {
             Token* next = advance();
             ASTNode* node = malloc(sizeof(ASTNode));
             node->type = AST_PRINT_STATEMENT;
-            node->name = NULL;
-            node->value = strdup(next->lexeme);
+            node->name = strdup(next->lexeme);
+            node->value = NULL;
             node->next = NULL;
 
             if (!head) head = node;

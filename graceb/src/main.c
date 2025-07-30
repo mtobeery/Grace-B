@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     ASTNode* root = parse_tokens();
     print_ast(root);
     free_ast(root);
-    free_symbols();
+    clear_symbols();
 
     free(source);
     return 0;

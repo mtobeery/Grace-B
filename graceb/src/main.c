@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/tokens.h"
+#include "../include/ast.h"
 
 extern Token tokens[];
 extern int token_count;
@@ -36,6 +37,10 @@ int main(int argc, char** argv) {
                tokens[i].line,
                tokens[i].column);
     }
+
+    ASTNode* root = parse_tokens();
+    print_ast(root);
+    free_ast(root);
 
     free(source);
     return 0;

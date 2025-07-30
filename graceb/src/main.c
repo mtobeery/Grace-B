@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     print_ast(root);
     free_ast(root);
     clear_symbols();
+    clear_functions();
 
     free(source);
     return 0;

@@ -43,6 +43,10 @@ void tokenize(const char* source) {
                 add_token(TOKEN_ELSE, word, line, col);
             } else if (strcmp(word, "while") == 0) {
                 add_token(TOKEN_WHILE, word, line, col);
+            } else if (strcmp(word, "fn") == 0) {
+                add_token(TOKEN_FN, word, line, col);
+            } else if (strcmp(word, "return") == 0) {
+                add_token(TOKEN_RETURN, word, line, col);
             } else {
                 add_token(TOKEN_IDENTIFIER, word, line, col);
             }
@@ -68,6 +72,10 @@ void tokenize(const char* source) {
             p += 2; col += 2;
             continue;
         }
+
+        if (*p == '(') { add_token(TOKEN_LPAREN, "(", line, col); p++; col++; continue; }
+        if (*p == ')') { add_token(TOKEN_RPAREN, ")", line, col); p++; col++; continue; }
+        if (*p == ',') { add_token(TOKEN_COMMA, ",", line, col); p++; col++; continue; }
 
         char punct[2] = {*p, '\0'};
         add_token(TOKEN_PUNCTUATION, punct, line, col);

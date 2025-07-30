@@ -8,7 +8,10 @@ typedef enum {
     AST_PRINT_STATEMENT,
     AST_VAR_DECL,
     AST_IF_STATEMENT,
-    AST_WHILE_STATEMENT
+    AST_WHILE_STATEMENT,
+    AST_FUNCTION_DECLARATION,
+    AST_RETURN_STATEMENT,
+    AST_FUNCTION_CALL
 } ASTNodeType;
 
 typedef struct ASTNode {
@@ -19,6 +22,7 @@ typedef struct ASTNode {
     struct ASTNode* left;
     struct ASTNode* right;
     struct ASTNode* else_branch;
+    struct ASTNode* args;
     struct ASTNode* next;
 } ASTNode;
 

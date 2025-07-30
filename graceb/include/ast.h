@@ -22,6 +22,7 @@ typedef struct ASTNode {
     struct ASTNode* left;
     struct ASTNode* right;
     struct ASTNode* else_branch;
+    struct ASTNode* else_body; /* new field for else support */
     struct ASTNode* args;
     struct ASTNode* next;
 } ASTNode;

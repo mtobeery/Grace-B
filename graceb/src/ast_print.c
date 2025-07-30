@@ -77,7 +77,10 @@ void print_ast(ASTNode* root) {
             printf("IF (%d)\n", cond);
             if (cond) {
                 print_ast(root->right);
+            } else if (root->else_body) {
+                print_ast(root->else_body);
             } else if (root->else_branch) {
+                /* fallback for older field */
                 print_ast(root->else_branch);
             }
             break;
@@ -123,7 +126,11 @@ static void free_node(ASTNode* node) {
     if (!node) return;
     free_node(node->left);
     free_node(node->right);
-    free_node(node->else_branch);
+    /* else_branch is kept for backward compatibility and may alias else_body */
+    if (node->else_body && node->else_body != node->else_branch)
+        free_node(node->else_body);
+    else if (node->else_branch)
+        free_node(node->else_branch);
     free_node(node->args);
     free(node->name);
     free(node->value);

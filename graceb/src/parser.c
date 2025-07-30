@@ -177,6 +177,7 @@ static ASTNode* parse_statement() {
         node->left = condition;
         node->right = body;
         node->else_branch = else_body;
+        node->else_body = else_body; /* keep compatibility */
         node->next = NULL;
 
         return node;

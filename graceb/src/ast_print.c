@@ -17,6 +17,7 @@ int evaluate(ASTNode* node) {
             int r = evaluate(node->right);
             if (node->op == '+') return l + r;
             if (node->op == '-') return l - r;
+            if (node->op == '=') return l == r;
             return 0;
         }
         default:
@@ -43,13 +44,21 @@ void print_ast(ASTNode* root) {
             case AST_INT_LITERAL:
                 printf("INT: %s\n", root->value);
                 break;
-            case AST_BINARY_EXPR: {
-                int v = evaluate(root);
-                printf("BIN_EXPR: %d\n", v);
-                break;
+        case AST_BINARY_EXPR: {
+            int v = evaluate(root);
+            printf("BIN_EXPR: %d\n", v);
+            break;
+        }
+        case AST_IF_STATEMENT: {
+            int cond = evaluate(root->left);
+            printf("IF (%d)\n", cond);
+            if (cond) {
+                print_ast(root->right);
             }
-            default:
-                printf("UNKNOWN AST NODE\n");
+            break;
+        }
+        default:
+            printf("UNKNOWN AST NODE\n");
         }
         root = root->next;
     }

@@ -6,7 +6,8 @@ typedef enum {
     AST_IDENTIFIER,
     AST_BINARY_EXPR,
     AST_PRINT_STATEMENT,
-    AST_VAR_DECL
+    AST_VAR_DECL,
+    AST_IF_STATEMENT
 } ASTNodeType;
 
 typedef struct ASTNode {

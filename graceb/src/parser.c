@@ -114,6 +114,20 @@ static ASTNode* parse_statement() {
         return node;
     }
 
+    if (t->type == TOKEN_WHILE || (t->type == TOKEN_IDENTIFIER && strcmp(t->lexeme, "while") == 0)) {
+        ASTNode* condition = parse_expression();
+        ASTNode* body = parse_statement();
+
+        ASTNode* node = malloc(sizeof(ASTNode));
+        memset(node, 0, sizeof(ASTNode));
+        node->type = AST_WHILE_STATEMENT;
+        node->left = condition;
+        node->right = body;
+        node->next = NULL;
+
+        return node;
+    }
+
     if (strcmp(t->lexeme, "print") == 0) {
         Token* next = advance();
         ASTNode* node = malloc(sizeof(ASTNode));

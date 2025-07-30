@@ -57,6 +57,14 @@ void print_ast(ASTNode* root) {
             }
             break;
         }
+        case AST_WHILE_STATEMENT: {
+            int cond = evaluate(root->left);
+            printf("WHILE (%d)\n", cond);
+            while (evaluate(root->left)) {
+                print_ast(root->right);
+            }
+            break;
+        }
         default:
             printf("UNKNOWN AST NODE\n");
         }

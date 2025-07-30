@@ -103,12 +103,19 @@ static ASTNode* parse_statement() {
     if (t->type == TOKEN_IF || (t->type == TOKEN_IDENTIFIER && strcmp(t->lexeme, "if") == 0)) {
         ASTNode* condition = parse_expression();
         ASTNode* body = parse_statement();
+        ASTNode* else_body = NULL;
+        if (peek()->type == TOKEN_ELSE ||
+            (peek()->type == TOKEN_IDENTIFIER && strcmp(peek()->lexeme, "else") == 0)) {
+            advance();
+            else_body = parse_statement();
+        }
 
         ASTNode* node = malloc(sizeof(ASTNode));
         memset(node, 0, sizeof(ASTNode));
         node->type = AST_IF_STATEMENT;
         node->left = condition;
         node->right = body;
+        node->else_branch = else_body;
         node->next = NULL;
 
         return node;

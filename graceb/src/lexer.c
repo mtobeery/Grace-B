@@ -39,6 +39,8 @@ void tokenize(const char* source) {
                 add_token(TOKEN_INT, word, line, col);
             } else if (strcmp(word, "if") == 0) {
                 add_token(TOKEN_IF, word, line, col);
+            } else if (strcmp(word, "else") == 0) {
+                add_token(TOKEN_ELSE, word, line, col);
             } else if (strcmp(word, "while") == 0) {
                 add_token(TOKEN_WHILE, word, line, col);
             } else {

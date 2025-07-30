@@ -18,6 +18,7 @@ typedef struct ASTNode {
     char op;
     struct ASTNode* left;
     struct ASTNode* right;
+    struct ASTNode* else_branch;
     struct ASTNode* next;
 } ASTNode;
 

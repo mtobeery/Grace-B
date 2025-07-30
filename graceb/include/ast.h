@@ -4,11 +4,13 @@
 typedef enum {
     AST_INT_LITERAL,
     AST_IDENTIFIER,
-    AST_PRINT_STATEMENT
+    AST_PRINT_STATEMENT,
+    AST_VAR_DECL
 } ASTNodeType;
 
 typedef struct ASTNode {
     ASTNodeType type;
+    char* name;
     char* value;
     struct ASTNode* next;
 } ASTNode;

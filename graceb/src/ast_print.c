@@ -8,6 +8,9 @@ void print_ast(ASTNode* root) {
             case AST_PRINT_STATEMENT:
                 printf("PRINT: %s\n", root->value);
                 break;
+            case AST_VAR_DECL:
+                printf("VAR_DECL: int %s = %s\n", root->name, root->value);
+                break;
             case AST_INT_LITERAL:
                 printf("INT: %s\n", root->value);
                 break;
@@ -21,6 +24,7 @@ void print_ast(ASTNode* root) {
 void free_ast(ASTNode* root) {
     while (root) {
         ASTNode* next = root->next;
+        free(root->name);
         free(root->value);
         free(root);
         root = next;

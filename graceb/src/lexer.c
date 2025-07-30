@@ -37,6 +37,8 @@ void tokenize(const char* source) {
             char* word = strndup(start, len);
             if (strcmp(word, "int") == 0) {
                 add_token(TOKEN_INT, word, line, col);
+            } else if (strcmp(word, "if") == 0) {
+                add_token(TOKEN_IF, word, line, col);
             } else {
                 add_token(TOKEN_IDENTIFIER, word, line, col);
             }
@@ -56,7 +58,13 @@ void tokenize(const char* source) {
             continue;
         }
 
-        // Single-char punctuation
+        // Operators and punctuation
+        if (*p == '=' && *(p + 1) == '=') {
+            add_token(TOKEN_PUNCTUATION, "==", line, col);
+            p += 2; col += 2;
+            continue;
+        }
+
         char punct[2] = {*p, '\0'};
         add_token(TOKEN_PUNCTUATION, punct, line, col);
         p++; col++;

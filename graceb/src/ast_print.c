@@ -3,6 +3,11 @@
 #include "../include/ast.h"
 #include "../include/symbol_table.h"
 
+static int return_flag = 0;
+static int return_value = 0;
+
+static int call_function(ASTNode* call);
+
 int evaluate(ASTNode* node) {
     if (!node) return 0;
     switch (node->type) {
@@ -20,6 +25,8 @@ int evaluate(ASTNode* node) {
             if (node->op == '=') return l == r;
             return 0;
         }
+        case AST_FUNCTION_CALL:
+            return call_function(node);
         default:
             return 0;
     }
@@ -38,8 +45,24 @@ void print_ast(ASTNode* root) {
                     printf("PRINT: %s\n", root->name ? root->name : "<null>");
                 break;
             }
-            case AST_VAR_DECL:
-                printf("VAR_DECL: int %s = %s\n", root->name, root->value);
+            case AST_VAR_DECL: {
+                int v = evaluate(root->left);
+                char buf[64];
+                snprintf(buf, sizeof(buf), "%d", v);
+                add_symbol(root->name, buf);
+                printf("VAR_DECL: int %s = %d\n", root->name, v);
+                break;
+            }
+            case AST_FUNCTION_DECLARATION:
+                add_function(root->name, root);
+                printf("FN_DECL: %s\n", root->name);
+                break;
+            case AST_RETURN_STATEMENT:
+                return_value = evaluate(root->left);
+                return_flag = 1;
+                return;
+            case AST_FUNCTION_CALL:
+                evaluate(root);
                 break;
             case AST_INT_LITERAL:
                 printf("INT: %s\n", root->value);
@@ -74,11 +97,34 @@ void print_ast(ASTNode* root) {
     }
 }
 
+static int call_function(ASTNode* call) {
+    FunctionSymbol* f = lookup_function(call->name);
+    if (!f) return 0;
+    ASTNode* param = f->declaration->args;
+    ASTNode* arg = call->args;
+    int pushed = 0;
+    while (param && arg) {
+        int val = evaluate(arg);
+        char buf[64];
+        snprintf(buf, sizeof(buf), "%d", val);
+        add_symbol(param->name, buf);
+        pushed++;
+        param = param->next;
+        arg = arg->next;
+    }
+    return_flag = 0;
+    return_value = 0;
+    print_ast(f->declaration->right);
+    pop_symbols(pushed);
+    return return_value;
+}
+
 static void free_node(ASTNode* node) {
     if (!node) return;
     free_node(node->left);
     free_node(node->right);
     free_node(node->else_branch);
+    free_node(node->args);
     free(node->name);
     free(node->value);
     free(node);

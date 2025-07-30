@@ -12,7 +12,12 @@ typedef enum {
     TOKEN_INT,
     TOKEN_IF,
     TOKEN_ELSE,
-    TOKEN_WHILE
+    TOKEN_WHILE,
+    TOKEN_FN,
+    TOKEN_RETURN,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
+    TOKEN_COMMA
 } TokenType;
 
 typedef struct {

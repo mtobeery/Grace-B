@@ -1,2 +1,2 @@
-print 42
-print 99
+int x = 10
+print x

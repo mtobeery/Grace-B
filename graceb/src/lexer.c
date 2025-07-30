@@ -35,7 +35,11 @@ void tokenize(const char* source) {
             while (isalnum(*p)) p++;
             int len = p - start;
             char* word = strndup(start, len);
-            add_token(TOKEN_IDENTIFIER, word, line, col);
+            if (strcmp(word, "int") == 0) {
+                add_token(TOKEN_INT, word, line, col);
+            } else {
+                add_token(TOKEN_IDENTIFIER, word, line, col);
+            }
             col += len;
             free(word);
             continue;

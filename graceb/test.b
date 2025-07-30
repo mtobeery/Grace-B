@@ -1,3 +1,2 @@
-int main {
-  print 42
-}
+print 42
+print 99

@@ -15,17 +15,17 @@ typedef struct FunctionSymbol {
     struct FunctionSymbol* next;
 } FunctionSymbol;
 
-void add_symbol(const char* name, const char* value);
-const char* lookup_symbol(const char* name);
-void clear_symbols();
-void pop_symbols(int count);
+typedef struct symbol_table {
+    Symbol* head;
+} symbol_table_t;
+
+symbol_table_t* create_symbol_table();
+void free_symbol_table(symbol_table_t* table);
+void add_symbol(symbol_table_t* table, const char* name, const char* value);
+const char* lookup_symbol(symbol_table_t* table, const char* name);
 
 void add_function(const char* name, ASTNode* decl);
 FunctionSymbol* lookup_function(const char* name);
 void clear_functions();
-
-/* Backwards compatibility */
-static inline const char* get_symbol(const char* name) { return lookup_symbol(name); }
-static inline void free_symbols() { clear_symbols(); }
 
 #endif // SYMBOL_TABLE_H

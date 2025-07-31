@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra
 
-SRC = src/main.c src/lexer.c src/parser.c src/ast_print.c src/symbol_table.c
+SRC = src/main.c src/lexer.c src/parser.c src/ast_print.c src/symbol_table.c src/stack.c
 OUT = graceb
 
 all:

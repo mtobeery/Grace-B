@@ -3,6 +3,7 @@
 #include "../include/tokens.h"
 #include "../include/ast.h"
 #include "../include/symbol_table.h"
+#include "../include/stack.h"
 
 extern Token tokens[];
 extern int token_count;
@@ -40,9 +41,11 @@ int main(int argc, char** argv) {
     }
 
     ASTNode* root = parse_tokens();
+    push_frame(create_symbol_table());
     print_ast(root);
+    pop_frame();
     free_ast(root);
-    clear_symbols();
+    clear_stack();
     clear_functions();
 
     free(source);

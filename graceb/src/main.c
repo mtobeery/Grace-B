@@ -4,8 +4,6 @@
 #include "../include/ast.h"
 #include "../include/symbol_table.h"
 
-extern Token tokens[];
-extern int token_count;
 void tokenize(const char* source);
 
 int main(int argc, char** argv) {
@@ -30,17 +28,8 @@ int main(int argc, char** argv) {
 
     tokenize(source);
 
-    for (int i = 0; i < token_count; i++) {
-        printf("Token[%d]: %s (type %d) at line %d col %d\n",
-               i,
-               tokens[i].lexeme,
-               tokens[i].type,
-               tokens[i].line,
-               tokens[i].column);
-    }
-
     ASTNode* root = parse_tokens();
-    print_ast(root);
+    eval_program(root);
     free_ast(root);
     clear_symbols();
     clear_functions();

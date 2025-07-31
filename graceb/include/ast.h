@@ -27,9 +27,14 @@ typedef struct ASTNode {
     struct ASTNode* next;
 } ASTNode;
 
+typedef struct eval_result {
+    int value;
+    int has_returned;
+} eval_result_t;
+
 ASTNode* parse_tokens();
-void print_ast(ASTNode* root);
+void eval_program(ASTNode* root);
 void free_ast(ASTNode* root);
-int evaluate(ASTNode* node);
+eval_result_t eval_node(ASTNode* node);
 
 #endif // AST_H

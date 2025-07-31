@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../include/ast.h"
 #include "../include/symbol_table.h"
+#include "../include/stack.h"
 
 static int return_flag = 0;
 static int return_value = 0;
@@ -14,7 +15,7 @@ int evaluate(ASTNode* node) {
         case AST_INT_LITERAL:
             return atoi(node->value);
         case AST_IDENTIFIER: {
-            const char* val = lookup_symbol(node->name);
+            const char* val = lookup_symbol(current_symbols(), node->name);
             return val ? atoi(val) : 0;
         }
         case AST_BINARY_EXPR: {
@@ -36,7 +37,7 @@ void print_ast(ASTNode* root) {
     while (root) {
         switch (root->type) {
             case AST_PRINT_STATEMENT: {
-                const char* resolved = lookup_symbol(root->name);
+                const char* resolved = lookup_symbol(current_symbols(), root->name);
                 if (resolved)
                     printf("PRINT: %s = %s\n", root->name, resolved);
                 else if (root->value)
@@ -49,7 +50,7 @@ void print_ast(ASTNode* root) {
                 int v = evaluate(root->left);
                 char buf[64];
                 snprintf(buf, sizeof(buf), "%d", v);
-                add_symbol(root->name, buf);
+                add_symbol(current_symbols(), root->name, buf);
                 printf("VAR_DECL: int %s = %d\n", root->name, v);
                 break;
             }
@@ -103,22 +104,22 @@ void print_ast(ASTNode* root) {
 static int call_function(ASTNode* call) {
     FunctionSymbol* f = lookup_function(call->name);
     if (!f) return 0;
+    symbol_table_t* table = create_symbol_table();
+    push_frame(table);
     ASTNode* param = f->declaration->args;
     ASTNode* arg = call->args;
-    int pushed = 0;
     while (param && arg) {
         int val = evaluate(arg);
         char buf[64];
         snprintf(buf, sizeof(buf), "%d", val);
-        add_symbol(param->name, buf);
-        pushed++;
+        add_symbol(current_symbols(), param->name, buf);
         param = param->next;
         arg = arg->next;
     }
     return_flag = 0;
     return_value = 0;
     print_ast(f->declaration->right);
-    pop_symbols(pushed);
+    pop_frame();
     return return_value;
 }
 

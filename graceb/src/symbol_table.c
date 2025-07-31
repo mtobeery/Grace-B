@@ -2,41 +2,17 @@
 #include <string.h>
 #include "../include/symbol_table.h"
 
-static Symbol* head = NULL;
 static FunctionSymbol* func_head = NULL;
 
-void add_symbol(const char* name, const char* value) {
-    Symbol* s = malloc(sizeof(Symbol));
-    if (!s) return;
-    s->name = strdup(name);
-    s->value = strdup(value);
-    s->next = head;
-    head = s;
+symbol_table_t* create_symbol_table() {
+    symbol_table_t* t = malloc(sizeof(symbol_table_t));
+    if (t) t->head = NULL;
+    return t;
 }
 
-void pop_symbols(int count) {
-    for (int i = 0; i < count && head; i++) {
-        Symbol* tmp = head;
-        head = head->next;
-        free(tmp->name);
-        free(tmp->value);
-        free(tmp);
-    }
-}
-
-const char* lookup_symbol(const char* name) {
-    Symbol* cur = head;
-    while (cur) {
-        if (strcmp(cur->name, name) == 0) {
-            return cur->value;
-        }
-        cur = cur->next;
-    }
-    return NULL;
-}
-
-void clear_symbols() {
-    Symbol* cur = head;
+void free_symbol_table(symbol_table_t* table) {
+    if (!table) return;
+    Symbol* cur = table->head;
     while (cur) {
         Symbol* tmp = cur;
         cur = cur->next;
@@ -44,7 +20,27 @@ void clear_symbols() {
         free(tmp->value);
         free(tmp);
     }
-    head = NULL;
+    free(table);
+}
+
+void add_symbol(symbol_table_t* table, const char* name, const char* value) {
+    if (!table) return;
+    Symbol* s = malloc(sizeof(Symbol));
+    if (!s) return;
+    s->name = strdup(name);
+    s->value = strdup(value);
+    s->next = table->head;
+    table->head = s;
+}
+
+const char* lookup_symbol(symbol_table_t* table, const char* name) {
+    if (!table) return NULL;
+    Symbol* cur = table->head;
+    while (cur) {
+        if (strcmp(cur->name, name) == 0) return cur->value;
+        cur = cur->next;
+    }
+    return NULL;
 }
 
 void add_function(const char* name, ASTNode* decl) {

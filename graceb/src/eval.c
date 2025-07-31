@@ -7,7 +7,7 @@
 eval_result_t eval_node(ASTNode* node); /* forward */
 
 static eval_result_t call_function(ASTNode* call) {
-    eval_result_t result = {0, 0};
+    eval_result_t result = {0, false};
     FunctionSymbol* f = lookup_function(call->name);
     if (!f)
         return result;
@@ -28,7 +28,7 @@ static eval_result_t call_function(ASTNode* call) {
     ASTNode* stmt = f->declaration->right;
     while (stmt) {
         eval_result_t r = eval_node(stmt);
-        if (r.has_returned) {
+        if (r.is_return) {
             pop_symbols(pushed);
             return r;
         }
@@ -40,7 +40,7 @@ static eval_result_t call_function(ASTNode* call) {
 }
 
 eval_result_t eval_node(ASTNode* node) {
-    eval_result_t result = {0, 0};
+    eval_result_t result = {0, false};
     if (!node)
         return result;
 
@@ -87,7 +87,7 @@ eval_result_t eval_node(ASTNode* node) {
         case AST_RETURN_STATEMENT: {
             eval_result_t v = eval_node(node->left);
             result.value = v.value;
-            result.has_returned = 1;
+            result.is_return = true;
             return result;
         }
         case AST_FUNCTION_CALL:
@@ -98,7 +98,7 @@ eval_result_t eval_node(ASTNode* node) {
             ASTNode* stmt = branch;
             while (stmt) {
                 eval_result_t r = eval_node(stmt);
-                if (r.has_returned)
+                if (r.is_return)
                     return r;
                 stmt = stmt->next;
             }
@@ -112,7 +112,7 @@ eval_result_t eval_node(ASTNode* node) {
                 ASTNode* stmt = node->right;
                 while (stmt) {
                     eval_result_t r = eval_node(stmt);
-                    if (r.has_returned)
+                    if (r.is_return)
                         return r;
                     stmt = stmt->next;
                 }

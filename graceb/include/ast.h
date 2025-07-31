@@ -27,9 +27,11 @@ typedef struct ASTNode {
     struct ASTNode* next;
 } ASTNode;
 
+#include <stdbool.h>
+
 typedef struct eval_result {
     int value;
-    int has_returned;
+    bool is_return;
 } eval_result_t;
 
 ASTNode* parse_tokens();

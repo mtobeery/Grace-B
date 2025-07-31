@@ -75,6 +75,8 @@ void tokenize(const char* source) {
 
         if (*p == '(') { add_token(TOKEN_LPAREN, "(", line, col); p++; col++; continue; }
         if (*p == ')') { add_token(TOKEN_RPAREN, ")", line, col); p++; col++; continue; }
+        if (*p == '[') { add_token(TOKEN_LBRACKET, "[", line, col); p++; col++; continue; }
+        if (*p == ']') { add_token(TOKEN_RBRACKET, "]", line, col); p++; col++; continue; }
         if (*p == ',') { add_token(TOKEN_COMMA, ",", line, col); p++; col++; continue; }
 
         char punct[2] = {*p, '\0'};

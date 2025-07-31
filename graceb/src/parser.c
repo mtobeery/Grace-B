@@ -73,6 +73,28 @@ static ASTNode* parse_primary() {
         node = parse_expression();
         if (peek()->type == TOKEN_RPAREN) advance();
         return node;
+    } else if (t->type == TOKEN_LBRACKET) {
+        node->type = AST_LIST_LITERAL;
+        node->list_length = 0;
+        node->list_values = NULL;
+        int capacity = 0;
+        if (peek()->type != TOKEN_RBRACKET) {
+            while (1) {
+                ASTNode* elem = parse_expression();
+                if (node->list_length >= capacity) {
+                    capacity = capacity ? capacity * 2 : 4;
+                    node->list_values = realloc(node->list_values, sizeof(ASTNode*) * capacity);
+                }
+                node->list_values[node->list_length++] = elem;
+                if (peek()->type == TOKEN_COMMA) {
+                    advance();
+                    continue;
+                }
+                break;
+            }
+        }
+        if (peek()->type == TOKEN_RBRACKET) advance();
+        return node;
     } else {
         free(node);
         return NULL;

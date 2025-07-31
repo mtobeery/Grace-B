@@ -17,7 +17,9 @@ typedef enum {
     TOKEN_RETURN,
     TOKEN_LPAREN,
     TOKEN_RPAREN,
-    TOKEN_COMMA
+    TOKEN_COMMA,
+    TOKEN_LBRACKET,
+    TOKEN_RBRACKET
 } TokenType;
 
 typedef struct {

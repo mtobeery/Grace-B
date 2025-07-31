@@ -11,7 +11,8 @@ typedef enum {
     AST_WHILE_STATEMENT,
     AST_FUNCTION_DECLARATION,
     AST_RETURN_STATEMENT,
-    AST_FUNCTION_CALL
+    AST_FUNCTION_CALL,
+    AST_LIST_LITERAL
 } ASTNodeType;
 
 typedef struct ASTNode {
@@ -25,12 +26,15 @@ typedef struct ASTNode {
     struct ASTNode* else_body; /* new field for else support */
     struct ASTNode* args;
     struct ASTNode* next;
+    int list_length;
+    struct ASTNode** list_values;
 } ASTNode;
 
 #include <stdbool.h>
 
 typedef struct eval_result {
     int value;
+    char* str_value;
     bool is_return;
 } eval_result_t;
 

@@ -7,7 +7,7 @@
 eval_result_t eval_node(ASTNode* node); /* forward */
 
 static eval_result_t call_function(ASTNode* call) {
-    eval_result_t result = {0, false};
+    eval_result_t result = {0, NULL, false};
     FunctionSymbol* f = lookup_function(call->name);
     if (!f)
         return result;
@@ -20,6 +20,7 @@ static eval_result_t call_function(ASTNode* call) {
         char buf[64];
         snprintf(buf, sizeof(buf), "%d", v.value);
         add_symbol(param->name, buf);
+        if (v.str_value) free(v.str_value);
         pushed++;
         param = param->next;
         arg = arg->next;
@@ -40,7 +41,7 @@ static eval_result_t call_function(ASTNode* call) {
 }
 
 eval_result_t eval_node(ASTNode* node) {
-    eval_result_t result = {0, false};
+    eval_result_t result = {0, NULL, false};
     if (!node)
         return result;
 
@@ -64,6 +65,34 @@ eval_result_t eval_node(ASTNode* node) {
                 result.value = (l.value == r.value);
             break;
         }
+        case AST_LIST_LITERAL: {
+            size_t cap = node->list_length * 16 + 2;
+            char* buf = malloc(cap);
+            if (!buf) break;
+            size_t pos = 0;
+            buf[pos++] = '[';
+            for (int i = 0; i < node->list_length; i++) {
+                eval_result_t v = eval_node(node->list_values[i]);
+                char tmp[64];
+                snprintf(tmp, sizeof(tmp), "%d", v.value);
+                size_t len = strlen(tmp);
+                if (pos + len + 2 >= cap) {
+                    cap = cap * 2 + len + 2;
+                    buf = realloc(buf, cap);
+                }
+                memcpy(buf + pos, tmp, len);
+                pos += len;
+                if (i != node->list_length - 1) {
+                    buf[pos++] = ',';
+                    buf[pos++] = ' ';
+                }
+            }
+            if (pos + 2 > cap) buf = realloc(buf, pos + 2);
+            buf[pos++] = ']';
+            buf[pos] = '\0';
+            result.str_value = buf;
+            break;
+        }
         case AST_PRINT_STATEMENT: {
             const char* resolved = lookup_symbol(node->name);
             if (resolved)
@@ -76,9 +105,14 @@ eval_result_t eval_node(ASTNode* node) {
         }
         case AST_VAR_DECL: {
             eval_result_t v = eval_node(node->left);
-            char buf[64];
-            snprintf(buf, sizeof(buf), "%d", v.value);
-            add_symbol(node->name, buf);
+            if (node->left->type == AST_LIST_LITERAL && v.str_value) {
+                add_symbol(node->name, v.str_value);
+                free(v.str_value);
+            } else {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "%d", v.value);
+                add_symbol(node->name, buf);
+            }
             break;
         }
         case AST_FUNCTION_DECLARATION:
@@ -87,6 +121,7 @@ eval_result_t eval_node(ASTNode* node) {
         case AST_RETURN_STATEMENT: {
             eval_result_t v = eval_node(node->left);
             result.value = v.value;
+            result.str_value = v.str_value;
             result.is_return = true;
             return result;
         }
@@ -143,6 +178,11 @@ static void free_node(ASTNode* node) {
     else if (node->else_branch)
         free_node(node->else_branch);
     free_node(node->args);
+    if (node->type == AST_LIST_LITERAL && node->list_values) {
+        for (int i = 0; i < node->list_length; i++)
+            free_node(node->list_values[i]);
+        free(node->list_values);
+    }
     free(node->name);
     free(node->value);
     free(node);
